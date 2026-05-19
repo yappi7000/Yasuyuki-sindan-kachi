@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1600">
+<title>市場価値ベースのキャリア診断表 | やっっぴ〜</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --gold: #C9A96E;
+  --gold-light: #E8C98A;
+  --gold-dark: #A07840;
+  --bg: #0A0C12;
+  --bg2: #111420;
+  --bg3: #181C2A;
+  --surface: #1E2236;
+  --surface2: #252A42;
+  --accent: #4A7AFF;
+  --accent2: #FF6B6B;
+  --accent3: #50E3B0;
+  --text: #E8EAF0;
+  --text-dim: #8A90A8;
+  --border: rgba(201,169,110,0.2);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  width: 1600px;
+  min-width: 1600px;
+}
+
+/* ─── HEADER ─── */
+.header {
+  background: linear-gradient(135deg, #0A0C12 0%, #111830 50%, #0A0C12 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 40px 60px 36px;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  background: radial-gradient(ellipse 60% 80% at 70% 50%, rgba(74,122,255,0.06) 0%, transparent 70%);
+}
+.header-grid { display:flex; align-items:center; justify-content:space-between; position:relative; }
+.header-left {}
+.badge {
+  display: inline-flex; align-items:center; gap:8px;
+  background: rgba(201,169,110,0.12);
+  border: 1px solid rgba(201,169,110,0.4);
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 11px; font-weight:700; letter-spacing:2px;
+  color: var(--gold); text-transform:uppercase;
+  margin-bottom:16px;
+}
+.badge::before { content:'◆'; font-size:8px; }
+.header-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 42px; line-height:1.1;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.header-title span { color: var(--gold); }
+.header-sub { font-size:13px; color:var(--text-dim); font-weight:300; letter-spacing:1px; }
+.header-meta {
+  text-align:right;
+}
+.meta-name {
+  font-size:28px; font-weight:900; color:var(--gold-light);
+  font-family:'Bebas Neue', sans-serif; letter-spacing:3px;
+  margin-bottom:4px;
+}
+.meta-date { font-size:11px; color:var(--text-dim); letter-spacing:1px; }
+.total-score-badge {
+  display:inline-flex; flex-direction:column; align-items:center;
+  background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(201,169,110,0.05));
+  border: 1px solid var(--gold);
+  border-radius:8px; padding:16px 28px; margin-top:12px;
+}
+.score-num {
+  font-family:'Bebas Neue'; font-size:56px; line-height:1;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.score-label { font-size:10px; letter-spacing:2px; color:var(--text-dim); margin-top:2px; }
+
+/* ─── LAYOUT ─── */
+.page { padding: 0 60px 60px; }
+.section { margin-top: 48px; }
+.section-title {
+  display:flex; align-items:center; gap:12px;
+  font-size:11px; font-weight:700; letter-spacing:3px;
+  color: var(--gold); text-transform:uppercase;
+  margin-bottom:24px;
+}
+.section-title::after {
+  content:''; flex:1; height:1px;
+  background: linear-gradient(90deg, rgba(201,169,110,0.4), transparent);
+}
+.section-num {
+  font-family:'Bebas Neue'; font-size:22px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 24px;
+}
+.card-gold {
+  background: linear-gradient(135deg, rgba(201,169,110,0.08), rgba(201,169,110,0.03));
+  border-color: var(--border);
+}
+
+/* ─── SCORE GRID ─── */
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+.score-item {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 20px 18px;
+  position:relative; overflow:hidden;
+}
+.score-item::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--item-color, var(--gold)), transparent);
+}
+.score-item-label { font-size:11px; color:var(--text-dim); margin-bottom:10px; letter-spacing:0.5px; }
+.score-item-num {
+  font-family:'Bebas Neue'; font-size:40px; line-height:1;
+  color: var(--item-color, var(--gold));
+}
+.score-item-bar {
+  height:4px; background:rgba(255,255,255,0.08); border-radius:2px; margin-top:10px;
+  overflow:hidden;
+}
+.score-item-fill {
+  height:100%; border-radius:2px;
+  background: linear-gradient(90deg, var(--item-color, var(--gold)), rgba(255,255,255,0.3));
+  transition: width 1s;
+}
+
+/* ─── INCOME RANGE ─── */
+.income-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  gap: 16px;
+}
+.income-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius:10px; padding:22px 20px;
+  text-align:center; position:relative; overflow:hidden;
+}
+.income-card.highlight {
+  background: linear-gradient(135deg, rgba(201,169,110,0.12), rgba(201,169,110,0.04));
+  border-color: var(--gold);
+}
+.income-label { font-size:10px; letter-spacing:1.5px; color:var(--text-dim); margin-bottom:8px; text-transform:uppercase; }
+.income-amount {
+  font-family:'Bebas Neue'; font-size:32px;
+  color: var(--gold-light);
+}
+.income-unit { font-size:11px; color:var(--text-dim); margin-top:4px; }
+.income-arrow { font-size:20px; color:var(--gold); margin-top:8px; }
+
+/* ─── RANKING ─── */
+.ranking-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.rank-list { list-style:none; }
+.rank-item {
+  display:flex; align-items:center; gap:14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.rank-item:last-child { border-bottom:none; }
+.rank-num {
+  font-family:'Bebas Neue'; font-size:26px; width:32px; text-align:center;
+  color: var(--text-dim);
+}
+.rank-item:nth-child(1) .rank-num { color: #FFD700; font-size:30px; }
+.rank-item:nth-child(2) .rank-num { color: #C0C0C0; font-size:28px; }
+.rank-item:nth-child(3) .rank-num { color: #CD7F32; font-size:26px; }
+.rank-bar-wrap { flex:1; }
+.rank-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+.rank-reason { font-size:11px; color:var(--text-dim); line-height:1.5; }
+.rank-score-pill {
+  font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;
+  white-space:nowrap;
+}
+
+/* ─── STRENGTHS / WEAKNESS ─── */
+.sw-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.sw-card {
+  background: var(--surface); border-radius:12px; padding:24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.sw-card.strength { border-top: 2px solid var(--accent3); }
+.sw-card.weakness { border-top: 2px solid var(--accent2); }
+.sw-title {
+  font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:18px;
+}
+.sw-card.strength .sw-title { color:var(--accent3); }
+.sw-card.weakness .sw-title { color:var(--accent2); }
+.sw-item {
+  display:flex; gap:10px; align-items:flex-start;
+  margin-bottom:14px;
+}
+.sw-dot {
+  width:6px; height:6px; border-radius:50%; margin-top:5px; flex-shrink:0;
+}
+.strength .sw-dot { background:var(--accent3); }
+.weakness .sw-dot { background:var(--accent2); }
+.sw-text-head { font-size:13px; font-weight:700; margin-bottom:2px; }
+.sw-text-body { font-size:11px; color:var(--text-dim); line-height:1.6; }
+
+/* ─── ROADMAP ─── */
+.roadmap { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:20px; }
+.rm-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius:12px; padding:22px;
+  position:relative; overflow:hidden;
+}
+.rm-card::before {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+  background: var(--rm-color, var(--gold));
+}
+.rm-period {
+  font-family:'Bebas Neue'; font-size:28px;
+  color: var(--rm-color, var(--gold));
+  margin-bottom:4px;
+}
+.rm-income { font-size:11px; color:var(--text-dim); margin-bottom:14px; }
+.rm-income strong { color:var(--gold-light); font-size:14px; }
+.rm-item { display:flex; gap:8px; margin-bottom:10px; align-items:flex-start; }
+.rm-check { color: var(--rm-color, var(--gold)); margin-top:1px; font-size:12px; flex-shrink:0; }
+.rm-item-text { font-size:12px; line-height:1.6; }
+
+/* ─── PORTFOLIO ─── */
+.portfolio-wrap { display:grid; grid-template-columns:340px 1fr; gap:32px; align-items:center; }
+.portfolio-legend { list-style:none; }
+.pf-item {
+  display:flex; align-items:center; gap:12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.pf-dot { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+.pf-name { font-size:13px; font-weight:600; flex:1; }
+.pf-pct { font-family:'Bebas Neue'; font-size:20px; }
+
+/* ─── CONCLUSION ─── */
+.conclusion {
+  background: linear-gradient(135deg, rgba(74,122,255,0.08), rgba(80,227,176,0.05));
+  border: 1px solid rgba(74,122,255,0.3);
+  border-radius:12px; padding:36px 40px;
+  position:relative; overflow:hidden;
+}
+.conclusion::before {
+  content: '"';
+  position:absolute; top:-20px; left:20px;
+  font-size:200px; color:rgba(74,122,255,0.06);
+  font-family:'DM Serif Display'; line-height:1;
+}
+.conclusion-title {
+  font-size:11px; letter-spacing:3px; color:var(--accent); text-transform:uppercase; font-weight:700;
+  margin-bottom:16px;
+}
+.conclusion-body { font-size:15px; line-height:2; color:var(--text); max-width:900px; }
+.conclusion-verdict {
+  margin-top:28px; padding:20px 24px;
+  background: rgba(201,169,110,0.1);
+  border: 1px solid var(--gold);
+  border-radius:8px;
+  display:flex; align-items:center; gap:16px;
+}
+.verdict-label { font-size:10px; letter-spacing:2px; color:var(--gold); white-space:nowrap; font-weight:700; }
+.verdict-text { font-size:15px; font-weight:700; color:var(--gold-light); line-height:1.5; }
+
+/* ─── CHARTS ─── */
+.charts-row { display:grid; grid-template-columns:420px 1fr; gap:32px; align-items:start; }
+.chart-wrap { position:relative; }
+
+/* ─── DIRECTION CARDS ─── */
+.direction-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.dir-card {
+  background:var(--surface); border-radius:12px; padding:22px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.dir-tag {
+  display:inline-block; font-size:10px; font-weight:700; letter-spacing:2px;
+  padding:4px 10px; border-radius:4px; margin-bottom:12px; text-transform:uppercase;
+}
+.dir-tag.short { background:rgba(255,107,107,0.15); color:#FF6B6B; }
+.dir-tag.mid { background:rgba(74,122,255,0.15); color:#4A7AFF; }
+.dir-tag.long { background:rgba(80,227,176,0.15); color:#50E3B0; }
+.dir-title { font-size:14px; font-weight:700; margin-bottom:10px; }
+.dir-body { font-size:12px; color:var(--text-dim); line-height:1.7; }
+.dir-target { margin-top:12px; font-size:12px; }
+.dir-target strong { color:var(--gold); }
+
+/* ─── FOOTER ─── */
+.footer {
+  margin-top:48px; padding:20px 60px;
+  border-top: 1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.footer-left { font-size:10px; color:var(--text-dim); letter-spacing:1px; }
+.footer-right { font-size:10px; color:var(--text-dim); }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="header-grid">
+    <div class="header-left">
+      <div class="badge">Confidential Strategic Report · 2026</div>
+      <div class="header-title">市場価値ベースの<span>キャリア診断表</span></div>
+      <div class="header-sub">TOP 5% CAREER STRATEGY CONSULTING · PERSONAL MARKET VALUE ANALYSIS</div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-name">YAPPY</div>
+      <div class="meta-date">発行日：2026年5月19日 ／ 対象期間：チャット履歴全件分析</div>
+      <div class="total-score-badge">
+        <div class="score-num">88</div>
+        <div class="score-label">総合キャリアスコア / 100</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ═══ ① スコア ═══ -->
+<div class="section">
+  <div class="section-title"><span class="section-num">01</span> 総合キャリアスコア詳細</div>
+  <div class="score-grid">
+    <div class="score-item" style="--item-color:#C9A96E">
+      <div class="score-item-label">市場価値</div>
+      <div class="score-item-num">91</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:91%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">MNP×転売の希少知識<br>再現不可能な実体験</div>
+    </div>
+    <div class="score-item" style="--item-color:#4A7AFF">
+      <div class="score-item-label">収益化力</div>
+      <div class="score-item-num">88</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:88%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">案件×コミュニティの<br>複数収益導線保有</div>
+    </div>
+    <div class="score-item" style="--item-color:#50E3B0">
+      <div class="score-item-label">営業力</div>
+      <div class="score-item-num">85</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:85%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">コミュニティ主導の<br>インバウンド型営業</div>
+    </div>
+    <div class="score-item" style="--item-color:#FF6B6B">
+      <div class="score-item-label">発信力</div>
+      <div class="score-item-num">84</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:84%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">X・Threads兼用の<br>マルチ発信設計済</div>
+    </div>
+    <div class="score-item" style="--item-color:#FFB74D">
+      <div class="score-item-label">継続力</div>
+      <div class="score-item-num">90</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:90%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">長期にわたる<br>ドメイン深化の証明</div>
+    </div>
+    <div class="score-item" style="--item-color:#CE93D8">
+      <div class="score-item-label">再現性</div>
+      <div class="score-item-num">87</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:87%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">教育コンテンツへの<br>体系化が進行中</div>
+    </div>
+    <div class="score-item" style="--item-color:#80DEEA">
+      <div class="score-item-label">事業適性</div>
+      <div class="score-item-num">92</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:92%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">情報ビジネス構造を<br>既に自力で構築済</div>
+    </div>
+    <div class="score-item" style="--item-color:#AED581">
+      <div class="score-item-label">SNS適性</div>
+      <div class="score-item-num">83</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:83%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">ニッチ特化型の<br>エンゲージ型発信</div>
+    </div>
+    <div class="score-item" style="--item-color:#FF8A65">
+      <div class="score-item-label">リスク耐性</div>
+      <div class="score-item-num">86</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:86%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">制度変更への<br>高速適応実績あり</div>
+    </div>
+    <div class="score-item" style="--item-color:#F48FB1">
+      <div class="score-item-label">自由度適性</div>
+      <div class="score-item-num">94</div>
+      <div class="score-item-bar"><div class="score-item-fill" style="width:94%"></div></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px">組織依存ゼロの<br>完全個人事業体質</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHARTS ROW ═══ -->
+<div class="section">
+  <div class="charts-row">
+    <div class="chart-wrap">
+      <div class="section-title"><span class="section-num">01</span> レーダーチャート</div>
+      <canvas id="radarChart" width="380" height="380"></canvas>
+    </div>
+    <div>
+      <!-- ═══ ② 年収レンジ ═══ -->
+      <div class="section-title"><span class="section-num">02</span> 適正年収レンジ分析</div>
+      <div class="income-row">
+        <div class="income-card">
+          <div class="income-label">現在推定値</div>
+          <div class="income-amount">300〜500</div>
+          <div class="income-unit">万円 / 年</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:8px">コミュニティ収益＋<br>MNP案件ベース</div>
+        </div>
+        <div class="income-card">
+          <div class="income-label">現実的到達ライン</div>
+          <div class="income-amount">800〜1,200</div>
+          <div class="income-unit">万円 / 年</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:8px">1〜2年でのコミュニティ<br>収益＋教育販売</div>
+        </div>
+        <div class="income-card highlight">
+          <div class="income-label">⚡ ポテンシャル最大値</div>
+          <div class="income-amount" style="font-size:36px">3,000〜5,000</div>
+          <div class="income-unit">万円 / 年</div>
+          <div style="font-size:10px;color:var(--gold);margin-top:8px">法人化＋SaaS的スケール<br>達成時の試算値</div>
+        </div>
+        <div class="income-card">
+          <div class="income-label">会社員換算</div>
+          <div class="income-amount">1,500〜2,000</div>
+          <div class="income-unit">万円相当 / 年</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:8px">同スキルを企業が採用した<br>場合の市場価格</div>
+        </div>
+        <div class="income-card">
+          <div class="income-label">個人事業換算</div>
+          <div class="income-amount">1,000〜2,500</div>
+          <div class="income-unit">万円 / 年</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:8px">3年以内の現実的<br>到達シナリオ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ③④ ランキング ═══ -->
+<div class="section">
+  <div class="ranking-grid">
+    <div class="card">
+      <div class="section-title"><span class="section-num">03</span> 向いている業種 TOP10</div>
+      <ul class="rank-list">
+        <li class="rank-item">
+          <div class="rank-num">1</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">📱 通信・MNPアービトラージ</div>
+            <div class="rank-reason">既に実績あり。制度理解×実体験の圧倒的優位性。参入障壁が高く希少ポジション確立済</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(201,169,110,0.2);color:var(--gold)">99pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">2</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">📚 情報コンテンツ・教育</div>
+            <div class="rank-reason">LINE有料コミュニティ運営中。知識の体系化と販売構造がすでに機能している</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(74,122,255,0.2);color:#4A7AFF">96pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">3</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">📲 SNSマーケティング</div>
+            <div class="rank-reason">X・Threadsでのマルチ発信経験。特定ニッチでの情報発信者として高い専門性</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(80,227,176,0.2);color:#50E3B0">92pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">4</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">🔁 紹介・アフィリエイト</div>
+            <div class="rank-reason">コミュニティ経由の紹介導線が自然発生。信頼ベースの高CVR案件が狙える</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(255,107,107,0.2);color:#FF6B6B">89pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">5</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">💳 金融・クレジットカード</div>
+            <div class="rank-reason">MNP案件との親和性が高く、ポイ活×通信の横展開が容易。単価が高い</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(255,183,77,0.2);color:#FFB74D">86pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">6</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">🛒 EC・転売・リセール</div>
+            <div class="rank-reason">iPhone転売実績あり。仕入れ×出口のロジックを既に体得している</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(206,147,216,0.2);color:#CE93D8">83pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">7</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">🏢 コミュニティ・サロン運営</div>
+            <div class="rank-reason">有料LINEグループ運営で実績。スケール次第でサブスク収益の柱になる</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(128,222,234,0.2);color:#80DEEA">81pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">8</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">📡 衛星・通信テクノロジー</div>
+            <div class="rank-reason">Rakuten Direct-to-Cell等の新技術への関心が高く、業界先読み発信が可能</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(174,213,129,0.2);color:#AED581">75pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">9</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">✈️ 旅行・節約・ライフハック</div>
+            <div class="rank-reason">パスポート費用削減等の節約系コンテンツへの関心。副次的発信ジャンルとして有効</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(255,138,101,0.2);color:#FF8A65">70pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">10</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">🤖 AIツール・自動化</div>
+            <div class="rank-reason">Claude活用の積極姿勢。コンテンツ制作自動化×通信知識の掛け算で希少性高い</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(244,143,177,0.2);color:#F48FB1">68pt</div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><span class="section-num">04</span> 向いている職種 TOP10</div>
+      <ul class="rank-list">
+        <li class="rank-item">
+          <div class="rank-num">1</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">👑 コミュニティオーナー／情報起業家</div>
+            <div class="rank-reason">既に実践中。専門知識×発信力×コミュニティ運営の三位一体が完成しつつある</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(201,169,110,0.2);color:var(--gold)">99pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">2</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">📝 SNSプロデューサー（自社）</div>
+            <div class="rank-reason">自社ブランド発信のためのSNS設計力。教育×通信ニッチでのオーソリティ確立</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(74,122,255,0.2);color:#4A7AFF">95pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">3</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">🔗 アライアンス／提携交渉</div>
+            <div class="rank-reason">MNP案件や通信業者との交渉経験。ハンドラー・ブローカーとの折衝スキルが高い</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(80,227,176,0.2);color:#50E3B0">91pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">4</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">📊 教育コンテンツクリエイター</div>
+            <div class="rank-reason">初心者〜上級者向けHTML教材の制作実績。複雑な制度をわかりやすく変換する力</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(255,107,107,0.2);color:#FF6B6B">89pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">5</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">💼 事業開発（通信×情報）</div>
+            <div class="rank-reason">新規収益モデルの発見と検証が得意。通信業界の隙間ビジネスの嗅覚が鋭い</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(255,183,77,0.2);color:#FFB74D">86pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">6</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">🎓 コンサルタント（通信特化）</div>
+            <div class="rank-reason">一般人が持ちえないMNP×SIM管理知識でBtoB・BtoC両方でのコンサル可能</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(206,147,216,0.2);color:#CE93D8">83pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">7</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">📣 インフルエンサー（ニッチ特化）</div>
+            <div class="rank-reason">フォロワー数より専門性。通信節約・MNPジャンルでの圧倒的差別化が可能</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(128,222,234,0.2);color:#80DEEA">80pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">8</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">🛍️ バイヤー／転売プロ</div>
+            <div class="rank-reason">iPhone転売での実績。仕入れ・検品・出口の全工程を把握している</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(174,213,129,0.2);color:#AED581">76pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">9</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">⚙️ AIプロンプトエンジニア（副業）</div>
+            <div class="rank-reason">Claudeを活用したコンテンツ制作の習熟度が高い。コンテンツ量産に転用可能</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(255,138,101,0.2);color:#FF8A65">70pt</div>
+        </li>
+        <li class="rank-item">
+          <div class="rank-num">10</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-name">🏗️ メディア運営者</div>
+            <div class="rank-reason">通信節約特化メディア＋アフィリエイトの組み合わせで安定収益化が狙える</div>
+          </div>
+          <div class="rank-score-pill" style="background:rgba(244,143,177,0.2);color:#F48FB1">65pt</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ⑤⑥ 強み・弱み ═══ -->
+<div class="section">
+  <div class="section-title"><span class="section-num">05 / 06</span> 強み分析 ／ 弱み・注意点</div>
+  <div class="sw-grid">
+    <div class="sw-card strength">
+      <div class="sw-title">✦ 市場で武器になる強み</div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">MNP×転売の実体験ベース知識</div>
+          <div class="sw-text-body">知識を「学んだ」ではなく「やって稼いだ」人間として、信頼性と再現性が段違い。模倣困難な希少性を持つ。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">複雑な制度を体系化・教材化する力</div>
+          <div class="sw-text-body">初心者向け〜上級者向けの階層別コンテンツをHTML形式で制作できる。情報の「翻訳者」としての価値が高い。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">コミュニティ運営のオーナーシップ</div>
+          <div class="sw-text-body">有料LINEグループという固定収益基盤を自力構築済み。メンバーとの関係性が資産化している。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">制度変更への高速適応力</div>
+          <div class="sw-text-body">通信業界の法改正・キャンペーン変化に即時対応できる情報感度。変化を脅威ではなく機会として捉える思考。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">ファミリー割×割引の最適化思考</div>
+          <div class="sw-text-body">6回線のY!mobile→UQ管理など、複雑な割引構造を最適解に導く分析力が突出。顧客への価値提供に直結。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">AIツール活用による生産性の高さ</div>
+          <div class="sw-text-body">Claudeを活用したHTML教材量産が可能。人間1人の作業量を10倍以上にスケールできる希少な実行力。</div>
+        </div>
+      </div>
+    </div>
+    <div class="sw-card weakness">
+      <div class="sw-title">⚠ 弱み・失敗パターン・注意点</div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">制度依存型ビジネスの限界リスク</div>
+          <div class="sw-text-body">MNPアービトラージは通信行政・各社の規約変更で一夜にして収益ゼロになるリスクがある。単一依存は危険。収益の多角化が急務。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">コンテンツの「陳腐化速度」が早い</div>
+          <div class="sw-text-body">通信プラン情報は数ヶ月で賞味期限切れ。更新コストが高く、長期ストック型資産になりにくい側面がある。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">ニッチすぎる市場の天井</div>
+          <div class="sw-text-body">MNP特化は市場規模に上限がある。日本の通信加入者数は固定的で、ターゲット人口が限られるため早期にスケール限界が来る。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">SNSフォロワー数の非公開（推測）</div>
+          <div class="sw-text-body">チャット内で大きなSNS実績の言及がない。発信力はあるが、まだオーディエンスの絶対数が収益化に十分でない可能性。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">一人オーナーの体力消耗リスク</div>
+          <div class="sw-text-body">コミュニティ運営・コンテンツ制作・MNP実践を1人で回すと燃え尽きリスクが高い。仕組み化と外注化のフェーズが必要。</div>
+        </div>
+      </div>
+      <div class="sw-item">
+        <div class="sw-dot"></div>
+        <div>
+          <div class="sw-text-head">法人化・会計管理の遅れリスク</div>
+          <div class="sw-text-body">収益が拡大するほど個人事業のままでは税負担が不利になる。早期の法人化・節税設計が収益最大化のボトルネックになる。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ⑦ 収益化方向性 ═══ -->
+<div class="section">
+  <div class="section-title"><span class="section-num">07</span> 最も収益化しやすい方向性（時系列分析）</div>
+  <div class="direction-grid">
+    <div class="dir-card">
+      <div class="dir-tag short">Short · 〜3ヶ月</div>
+      <div class="dir-title">🔥 現行コミュニティの単価UP × 紹介報酬の即時化</div>
+      <div class="dir-body">今すぐできる最速の収益増加策。現行LINEコミュニティの月額を値上げ（またはグレード制導入）し、既存メンバーの紹介経由でMNP案件の報酬単価を高める。新規開拓よりも現行基盤の最大活用が優先。HTML教材を有料販売商品として単品化し、ランディングページ化する。</div>
+      <div class="dir-target">短期目標：<strong>月収50〜100万円突破</strong></div>
+    </div>
+    <div class="dir-card">
+      <div class="dir-tag mid">Mid · 3ヶ月〜1年</div>
+      <div class="dir-title">📈 SNS×教材販売のファネル構築 × ブランド確立</div>
+      <div class="dir-body">X・Threadsでの「通信節約・MNP特化インフルエンサー」としてのポジション確立。無料発信→LINE誘導→有料教材・コミュニティというファネルを完成させる。通信業界に限らず「制度の隙間で稼ぐ専門家」としてのパーソナルブランドを形成。金融・クレカ系アフィリへの横展開開始。</div>
+      <div class="dir-target">中期目標：<strong>年収800万〜1,200万円圏</strong></div>
+    </div>
+    <div class="dir-card">
+      <div class="dir-tag long">Long · 1年〜3年</div>
+      <div class="dir-title">🏗️ 情報プラットフォーム化 × 法人スケール × 人材活用</div>
+      <div class="dir-body">個人の知識を「プラットフォーム」化する。MNP・通信特化のサブスクメディア、AIで更新し続けるデータベース型サービス、他のMNP実践者を束ねたエージェント型コミュニティへの発展。法人化×外注化で「自分がいなくても回る仕組み」を構築し、オーナーとしての収益を最大化。</div>
+      <div class="dir-target">長期目標：<strong>年収3,000万円〜・資産形成フェーズ</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ⑧ ポートフォリオ ═══ -->
+<div class="section">
+  <div class="section-title"><span class="section-num">08</span> 理想の収益ポートフォリオ（3年後設計）</div>
+  <div class="portfolio-wrap">
+    <div>
+      <ul class="portfolio-legend">
+        <li class="pf-item"><div class="pf-dot" style="background:#C9A96E"></div><div class="pf-name">コミュニティ会費（サブスク）</div><div class="pf-pct" style="color:#C9A96E">30%</div></li>
+        <li class="pf-item"><div class="pf-dot" style="background:#4A7AFF"></div><div class="pf-name">教育コンテンツ販売</div><div class="pf-pct" style="color:#4A7AFF">22%</div></li>
+        <li class="pf-item"><div class="pf-dot" style="background:#50E3B0"></div><div class="pf-name">MNP・通信紹介報酬</div><div class="pf-pct" style="color:#50E3B0">18%</div></li>
+        <li class="pf-item"><div class="pf-dot" style="background:#FF6B6B"></div><div class="pf-name">アフィリエイト（通信・金融）</div><div class="pf-pct" style="color:#FF6B6B">12%</div></li>
+        <li class="pf-item"><div class="pf-dot" style="background:#FFB74D"></div><div class="pf-name">SNS・広告収益</div><div class="pf-pct" style="color:#FFB74D">8%</div></li>
+        <li class="pf-item"><div class="pf-dot" style="background:#CE93D8"></div><div class="pf-name">個別コンサル・スポット</div><div class="pf-pct" style="color:#CE93D8">6%</div></li>
+        <li class="pf-item"><div class="pf-dot" style="background:#80DEEA"></div><div class="pf-name">iPhone転売・物販</div><div class="pf-pct" style="color:#80DEEA">4%</div></li>
+      </ul>
+      <div style="margin-top:16px;font-size:11px;color:var(--text-dim);line-height:1.8">
+        ※ サブスク比率30%以上を維持することで<br>
+        月次売上の安定性が保たれる<br>
+        ※ 物販比率は4%以下を推奨（労働集約的）<br>
+        ※ 紹介・アフィリは情報発信連動で自動化可能
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <canvas id="pieChart" width="400" height="400" style="max-width:380px;margin:0 auto;display:block"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ⑨ ロードマップ ═══ -->
+<div class="section">
+  <div class="section-title"><span class="section-num">09</span> 年収最大化ロードマップ</div>
+  <div class="roadmap">
+    <div class="rm-card" style="--rm-color:#FF6B6B">
+      <div class="rm-period">3ヶ月</div>
+      <div class="rm-income">目標収益：<strong>月収80〜100万円</strong></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">LINEコミュニティの料金改定（段階制導入）・入会導線の改善</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">HTML教材の単品商品化・LP作成・X/Threadsでの告知開始</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">MNP紹介フローの仕組み化・報酬体系の再設計</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">週3〜5本の定期発信スケジュール確立（X・Threads）</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">金融・クレカ系アフィリへの並走開始</div></div>
+    </div>
+    <div class="rm-card" style="--rm-color:#FFB74D">
+      <div class="rm-period">6ヶ月</div>
+      <div class="rm-income">目標収益：<strong>月収150〜200万円</strong></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">SNSフォロワー数：通信ニッチで1万人突破を目標設定</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">有料教材ラインナップ拡充（初心者編・上級者編・動画化）</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">コミュニティ会員数の拡大・紹介制度の導入</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">コンテンツ制作の外注・仕組み化着手（AI活用含む）</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">個人事業収益の整理・法人化タイミング検討</div></div>
+    </div>
+    <div class="rm-card" style="--rm-color:#4A7AFF">
+      <div class="rm-period">1年</div>
+      <div class="rm-income">目標収益：<strong>年収1,000〜1,500万円</strong></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">法人化完了・節税スキーム確立（役員報酬設計）</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">「通信節約の専門家」としてのメディア露出・インタビュー対応</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">MNP以外の第2収益柱確立（金融・保険・旅行等）</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">コミュニティ月額収益：100万円以上の安定化</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">アシスタント採用or外注パートナーとの協業体制</div></div>
+    </div>
+    <div class="rm-card" style="--rm-color:#50E3B0">
+      <div class="rm-period">3年</div>
+      <div class="rm-income">目標収益：<strong>年収3,000〜5,000万円</strong></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">通信特化サブスクサービス（DB・ツール）のリリース</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">MNP実践者コミュニティのプラットフォーム化・他者収益化</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">複数スタッフによるオペレーション分離・オーナー化</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">資産形成フェーズ移行（投資・不動産・事業売却検討）</div></div>
+      <div class="rm-item"><div class="rm-check">▶</div><div class="rm-item-text">ライセンス・フランチャイズモデルへの展開</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ バーグラフ ═══ -->
+<div class="section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+    <div class="card">
+      <div style="font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:20px">年収成長シミュレーション</div>
+      <canvas id="barChart" height="200"></canvas>
+    </div>
+    <div class="card" style="background:linear-gradient(135deg,rgba(74,122,255,0.06),rgba(74,122,255,0.02));border-color:rgba(74,122,255,0.2)">
+      <div style="font-size:11px;letter-spacing:2px;color:#4A7AFF;text-transform:uppercase;font-weight:700;margin-bottom:20px">希少性マップ：市場での立ち位置</div>
+      <canvas id="scatterChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ⑩ 総合コメント ═══ -->
+<div class="section">
+  <div class="section-title"><span class="section-num">10</span> 総合コメント ／ 戦略的総括</div>
+  <div class="conclusion">
+    <div class="conclusion-title">STRATEGIC VERDICT — CONSULTING ANALYST FINAL REPORT</div>
+    <div class="conclusion-body">
+      やっっぴ〜氏の最大の強みは、<strong style="color:var(--gold-light)">「誰もが参入できない領域で、誰よりも深く実践し続けている」</strong>という圧倒的なドメイン特化性にある。MNPアービトラージ・iPhone転売・キャリア割引最適化という、一般人には複雑すぎて近づけない領域を、長期間にわたって実践・体系化・教育化してきた。これは単なる「知識持ち」ではなく、<strong style="color:var(--accent3)">「稼いだ経験者」としての信頼資産</strong>であり、市場では極めて希少なポジションである。<br><br>
+      現状の課題は「個人の限界」にある。すべてを自分でこなすオペレーションは収益の天井を作っている。次のステージは<strong style="color:var(--accent)">「知識を仕組みに変える」</strong>フェーズ——つまり、コミュニティ・教材・SNSという3軸を連動させた自動集客ファネルを完成させ、自分が動かなくても収益が入る構造を構築することが急務だ。<br><br>
+      リスク管理の観点では、MNP単依存からの脱却を早急に進めるべきである。金融・クレカ・保険・節約系への横展開は、同じ「制度×情報格差」の文脈で戦えるため親和性が高く、収益多角化として最速の選択肢となる。
+    </div>
+    <div class="conclusion-verdict">
+      <div class="verdict-label">最も伸びる<br>ビジネスモデル<br>◆ FINAL ANSWER</div>
+      <div class="verdict-text">
+        「<strong>MNP×節約特化の有料教育コミュニティ＋サブスク型情報プラットフォーム</strong>」<br>
+        <span style="font-size:13px;color:var(--text-dim);font-weight:400">専門知識を武器にSNSで集客 → 有料コミュニティへ誘導 → 教材販売・紹介報酬で複利収益化。<br>
+        「知っている人間」から「稼がせてくれる仕組みのオーナー」へ転換することが、最速・最大の勝ち筋である。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-left">TOP 5% CAREER STRATEGY CONSULTING · CONFIDENTIAL · やっっぴ〜 専用分析レポート · 2026年5月19日発行</div>
+  <div class="footer-right">総合スコア <strong style="color:var(--gold)">88 / 100</strong> ｜ ポテンシャル最大年収 <strong style="color:var(--gold)">5,000万円</strong></div>
+</div>
+
+<script>
+// ─── Radar Chart ───
+const radarCtx = document.getElementById('radarChart').getContext('2d');
+new Chart(radarCtx, {
+  type: 'radar',
+  data: {
+    labels: ['市場価値','収益化力','営業力','発信力','継続力','再現性','事業適性','SNS適性','リスク耐性','自由度適性'],
+    datasets: [{
+      label: 'やっっぴ〜',
+      data: [91,88,85,84,90,87,92,83,86,94],
+      backgroundColor: 'rgba(201,169,110,0.15)',
+      borderColor: '#C9A96E',
+      borderWidth: 2,
+      pointBackgroundColor: '#C9A96E',
+      pointRadius: 4,
+    }]
+  },
+  options: {
+    responsive: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        min: 60, max: 100,
+        ticks: { display: false, stepSize: 10 },
+        grid: { color: 'rgba(255,255,255,0.08)' },
+        angleLines: { color: 'rgba(255,255,255,0.08)' },
+        pointLabels: {
+          color: '#8A90A8', font: { size: 11, family: 'Noto Sans JP' }
+        }
+      }
+    }
+  }
+});
+
+// ─── Pie Chart ───
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+new Chart(pieCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['コミュニティ会費','教育コンテンツ販売','MNP紹介報酬','アフィリエイト','SNS広告','個別コンサル','転売・物販'],
+    datasets: [{
+      data: [30,22,18,12,8,6,4],
+      backgroundColor: ['#C9A96E','#4A7AFF','#50E3B0','#FF6B6B','#FFB74D','#CE93D8','#80DEEA'],
+      borderColor: '#111420',
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: false,
+    cutout: '60%',
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.label}: ${ctx.raw}%`
+        }
+      }
+    }
+  }
+});
+
+// ─── Bar Chart ───
+const barCtx = document.getElementById('barChart').getContext('2d');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: ['現在','3ヶ月後','6ヶ月後','1年後','2年後','3年後'],
+    datasets: [{
+      label: '年収（万円）',
+      data: [400, 960, 1800, 1200, 2400, 4000],
+      backgroundColor: [
+        'rgba(201,169,110,0.3)',
+        'rgba(255,107,107,0.6)',
+        'rgba(255,183,77,0.6)',
+        'rgba(74,122,255,0.6)',
+        'rgba(74,122,255,0.8)',
+        'rgba(80,227,176,0.8)',
+      ],
+      borderColor: ['#C9A96E','#FF6B6B','#FFB74D','#4A7AFF','#4A7AFF','#50E3B0'],
+      borderWidth: 2,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.raw.toLocaleString()}万円` } }
+    },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8A90A8', font:{size:11} } },
+      y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8A90A8', font:{size:11}, callback: v => v.toLocaleString()+'万' } }
+    }
+  }
+});
+
+// ─── Scatter Chart (希少性マップ) ───
+const scatterCtx = document.getElementById('scatterChart').getContext('2d');
+new Chart(scatterCtx, {
+  type: 'bubble',
+  data: {
+    datasets: [
+      { label: 'MNP実践者', data: [{x:85,y:92,r:20}], backgroundColor: 'rgba(201,169,110,0.8)', borderColor:'#C9A96E' },
+      { label: '教育コンテンツ', data: [{x:72,y:78,r:14}], backgroundColor: 'rgba(74,122,255,0.6)', borderColor:'#4A7AFF' },
+      { label: 'SNS発信', data: [{x:65,y:70,r:10}], backgroundColor: 'rgba(80,227,176,0.5)', borderColor:'#50E3B0' },
+      { label: '転売物販', data: [{x:60,y:55,r:8}], backgroundColor: 'rgba(255,107,107,0.5)', borderColor:'#FF6B6B' },
+      { label: 'コンサル', data: [{x:78,y:85,r:12}], backgroundColor: 'rgba(206,147,216,0.5)', borderColor:'#CE93D8' },
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: '#8A90A8', font:{size:10}, boxWidth:10 } }
+    },
+    scales: {
+      x: {
+        title: { display:true, text:'市場希少性', color:'#8A90A8', font:{size:10} },
+        min:40, max:100,
+        grid: { color:'rgba(255,255,255,0.05)' },
+        ticks: { color:'#8A90A8', font:{size:10} }
+      },
+      y: {
+        title: { display:true, text:'収益ポテンシャル', color:'#8A90A8', font:{size:10} },
+        min:40, max:100,
+        grid: { color:'rgba(255,255,255,0.05)' },
+        ticks: { color:'#8A90A8', font:{size:10} }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
